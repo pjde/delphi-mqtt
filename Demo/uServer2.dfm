@@ -193,8 +193,8 @@ object MainForm: TMainForm
     Caption = 'Topic'
   end
   object ClientIDTxt: TLabel
-    Left = 685
-    Top = 203
+    Left = 683
+    Top = 179
     Width = 38
     Height = 13
     Caption = 'ClientID'
@@ -207,11 +207,19 @@ object MainForm: TMainForm
     Alignment = taCenter
     AutoSize = False
   end
+  object Label12: TLabel
+    Left = 653
+    Top = 196
+    Width = 22
+    Height = 13
+    Caption = 'Host'
+  end
   object Memo1: TMemo
     Left = 2
     Top = 20
     Width = 421
     Height = 183
+    ScrollBars = ssVertical
     TabOrder = 0
     OnDblClick = Memo1DblClick
   end
@@ -235,9 +243,10 @@ object MainForm: TMainForm
   end
   object Memo2: TMemo
     Left = 7
-    Top = 239
+    Top = 234
     Width = 279
-    Height = 189
+    Height = 194
+    ScrollBars = ssVertical
     TabOrder = 3
     OnDblClick = Memo2DblClick
   end
@@ -518,6 +527,14 @@ object MainForm: TMainForm
     Caption = 'On'
     TabOrder = 33
     OnClick = Button10Click
+  end
+  object AddrTxt: TEdit
+    Left = 683
+    Top = 193
+    Width = 129
+    Height = 21
+    TabOrder = 34
+    Text = '10.0.0.2'
   end
   object TTServer: TMQTTServer
     MaxRetries = 4

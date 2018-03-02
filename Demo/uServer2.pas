@@ -72,6 +72,8 @@ type
     JTxt: TEdit;
     Edit1: TEdit;
     Button10: TButton;
+    AddrTxt: TEdit;
+    Label12: TLabel;
 
     procedure FormCreate (Sender : TObject);
     procedure FormDestroy(Sender: TObject);
@@ -172,23 +174,24 @@ begin
   TTServer.Activate (true);
 end;
 
-procedure TMainForm.Button16Click(Sender: TObject);
+procedure TMainForm.Button16Click (Sender: TObject);
 begin
   TTServer.Activate(false);
 end;
 
-procedure TMainForm.Button17Click(Sender: TObject);
+procedure TMainForm.Button17Click (Sender: TObject);
 begin
   TTClient.Activate (false);
 end;
 
-procedure TMainForm.Button18Click(Sender: TObject);
+procedure TMainForm.Button18Click (Sender: TObject);
 begin
+  TTClient.Host := AddrTxt.Text;
   TTClient.Port := StrToIntDef (CPortTxt.Text, 1883);
   TTClient.Activate (true);
 end;
 
-procedure TMainForm.Button1Click(Sender: TObject);
+procedure TMainForm.Button1Click (Sender: TObject);
 var
   j : integer;
   x : cardinal;
@@ -232,7 +235,7 @@ begin
     end;
 end;
 
-procedure TMainForm.Button24Click(Sender: TObject);
+procedure TMainForm.Button24Click (Sender: TObject);
 var
   i, x : integer;
   aStr : AnsiString;
@@ -246,13 +249,13 @@ begin
   TTClient.Publish (UTF8String (TopicTxt.Text), aStr, aQos, aRetain);
 end;
 
-procedure TMainForm.Button2Click(Sender: TObject);
+procedure TMainForm.Button2Click (Sender: TObject);
 begin
   BrokerForm.FServer := TTServer;
   BrokerForm.Show;
 end;
 
-procedure TMainForm.Button3Click(Sender: TObject);
+procedure TMainForm.Button3Click (Sender: TObject);
 begin
   try
     TTClient.Link.Close;
@@ -265,7 +268,7 @@ begin
   TTClient.Publish ('request/png/' + TTClient.ClientID, '?', qtEXACTLY_ONCE);
 end;
 
-procedure TMainForm.Button5Click(Sender: TObject);
+procedure TMainForm.Button5Click (Sender: TObject);
 var
   s : TStringlist;
   i : integer;
@@ -329,6 +332,7 @@ procedure TMainForm.FormShow (Sender: TObject);
 begin
   PortTxt.Text := IntToStr (TTServer.Port);
   CPortTxt.Text := IntToStr (TTClient.Port);
+  AddrTxt.Text := TTClient.Host;
   BounceBox.Checked := TTServer.LocalBounce;
   BounceBox2.Checked := TTClient.LocalBounce;
   rb1.Checked := (aQos = qtAT_MOST_ONCE);
@@ -360,6 +364,7 @@ begin
     begin
       TTServer.Port := ReadInteger ('SERVER', 'Port', 1883);
       TTServer.LocalBounce := ReadBool ('SERVER', 'Local Bounce', true);
+      TTClient.Host := ReadString ('CLIENT', 'Host', 'localhost');
       TTClient.Port := ReadInteger ('CLIENT', 'Port', 1883);
       TTClient.LocalBounce := ReadBool ('CLIENT', 'Local Bounce', false);
       aQos := TMQTTQOSType (ReadInteger ('CLIENT', 'Qos', 1));
@@ -378,6 +383,7 @@ begin
     begin
       WriteInteger ('SERVER', 'Port', TTServer.Port);
       WriteBool ('SERVER', 'Local Bounce', TTServer.LocalBounce);
+      writeString ('CLIENT', 'Host', TTClient.Host);
       WriteInteger ('CLIENT', 'Port', TTClient.Port);
       WriteInteger ('CLIENT', 'Qos', ord (aQos));
       WriteBool ('CLIENT', 'Local Bounce', TTClient.LocalBounce);
