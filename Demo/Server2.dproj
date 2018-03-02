@@ -30,7 +30,7 @@
 			<DCC_ExeOutput>.\$(Config)\$(Platform)</DCC_ExeOutput>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1)'!=''">
-			<DCC_UnitSearchPath>C:\Delphi Projects\ICS\Delphi;C:\Delphi Projects\ICS\Delphi\Vc32;C:\Delphi Projects\Virtual Treeview\Resources;C:\Delphi Projects\Virtual Treeview\Source;C:\Delphi Projects\Virtual Treeview\Common;C:\Delphi Projects\Graphics32;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<DCC_UnitSearchPath>C:\Delphi Projects\Virtual Treeview\Resources;C:\Delphi Projects\Graphics32;C:\Delphi Projects\icsv816\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 			<DCC_Optimize>false</DCC_Optimize>
 			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
