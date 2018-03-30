@@ -254,24 +254,24 @@ end;
 
 function CodeNames (aCode : byte) : string;
 begin
-    case (aCode) of
-      rcACCEPTED   : Result := 'ACCEPTED';                    // Connection Accepted
-      rcPROTOCOL   : Result := 'PROTOCOL UNACCEPTABLE';       // Connection Refused: unacceptable protocol version
-      rcIDENTIFIER : Result := 'IDENTIFIER REJECTED';         // Connection Refused: identifier rejected
-      rcSERVER     : Result := 'SERVER UNAVILABLE';           // Connection Refused: server unavailable
-      rcUSER       : Result := 'BAD LOGIN';                   // Connection Refused: bad user name or password
-      rcAUTHORISED : Result := 'NOT AUTHORISED'
-      else           Result := 'RESERVED ' + IntToStr (aCode);
-    end;
+  case (aCode) of
+    rcACCEPTED   : Result := 'ACCEPTED';                    // Connection Accepted
+    rcPROTOCOL   : Result := 'PROTOCOL UNACCEPTABLE';       // Connection Refused: unacceptable protocol version
+    rcIDENTIFIER : Result := 'IDENTIFIER REJECTED';         // Connection Refused: identifier rejected
+    rcSERVER     : Result := 'SERVER UNAVILABLE';           // Connection Refused: server unavailable
+    rcUSER       : Result := 'BAD LOGIN';                   // Connection Refused: bad user name or password
+    rcAUTHORISED : Result := 'NOT AUTHORISED'
+    else           Result := 'RESERVED ' + IntToStr (aCode);
+  end;
 end;
 
 function FailureNames (aCode : byte) : string;
 begin
-    case (aCode) of
-      frKEEPALIVE  : Result := 'KEEP ALIVE TIMEOUT';
-      frMAXRETRIES : Result := 'MAX RETRIES EXCEEDED';
-      else           Result := 'RESERVED ' + IntToStr (aCode);
-    end;
+  case (aCode) of
+    frKEEPALIVE  : Result := 'KEEP ALIVE TIMEOUT';
+    frMAXRETRIES : Result := 'MAX RETRIES EXCEEDED';
+    else           Result := 'RESERVED ' + IntToStr (aCode);
+  end;
 end;
 
 procedure DebugStr (aStr : string);
@@ -411,8 +411,7 @@ end;
 
 procedure TMQTTParser.Mon (aStr: string);
 begin
-  if Assigned (FOnMon) then
-    FOnMon (Self, 'P ' + aStr);
+  if Assigned (FOnMon) then FOnMon (Self, 'P ' + aStr);
 end;
 
 procedure TMQTTParser.Parse (aStr: AnsiString);
@@ -457,8 +456,7 @@ begin
             FRxState := rsLen;
             FRxMult := 1;
             FRxVal := 0;
-            if Assigned (FOnHeader) then
-              FOnHeader (Self, RxMsg, RxDup, RxQos, RxRetain);
+            if Assigned (FOnHeader) then FOnHeader (Self, RxMsg, RxDup, RxQos, RxRetain);
           end;
         rsLen :
           begin
@@ -500,7 +498,7 @@ begin
                   mtCONNECT  :
                     begin
                       pt := ReadStr (FRxStream);        // protocol
-                      vr := ReadByte (FRxStream);          // version
+                      vr := ReadByte (FRxStream);       // version
                       fl := ReadByte (FRxStream);
                       ka := ReadByte (FRxStream) * $100 + ReadByte (FRxStream);
                       ci := ReadStr (FRxStream);
@@ -521,7 +519,7 @@ begin
                         end;
                       aStr := '';
                       bStr := '';
-                      if un then aStr := ReadStr (FRxStream);        // unername
+                      if un then aStr := ReadStr (FRxStream);        // username
                       if ps then bStr := ReadStr (FRxStream);        // password
                       if RxMsg = mtCONNECT then
                         begin
@@ -538,12 +536,13 @@ begin
                     if FRxStream.Size >= 4 then
                       begin
                         aStr := ReadStr (FRxStream);
-                        id := ReadByte (FRxStream) * $100 + ReadByte (FRxStream);
+                        if RxQos in [qtAT_LEAST_ONCE, qtEXACTLY_ONCE] then
+                          id := ReadByte (FRxStream) * $100 + ReadByte (FRxStream)
+                        else
+                          id := 0;   // no id when RxQos = 0
                         SetLength (Str, FRxStream.Size - FRxStream.Position);
-                        if length (Str) > 0 then
-                          FRxStream.Read (Str[1], length (Str));
-                        if Assigned (FOnPublish) then
-                          FOnPublish (Self, id, aStr, Str);
+                        if length (Str) > 0 then FRxStream.Read (Str[1], length (Str));
+                        if Assigned (FOnPublish) then FOnPublish (Self, id, aStr, Str);
                       end;
                   mtPUBACK,
                   mtPUBREC,
@@ -741,10 +740,12 @@ begin
   AddHdr (FTxStream, mtPUBLISH, aDup, aQos, aRetain);
   s := TMemoryStream.Create;
   AddStr (s, aTopic);
-  AddByte (s, anID div $100);
-  AddByte (s, anID mod $100);
-  if length (aMessage) > 0 then
-    s.Write (aMessage[1], length (aMessage));
+  if aQos in [qtAT_LEAST_ONCE, qtEXACTLY_ONCE] then
+    begin
+      AddByte (s, anID div $100);
+      AddByte (s, anID mod $100);
+    end;
+  if length (aMessage) > 0 then s.Write (aMessage[1], length (aMessage));
   // payload
   s.Seek (0, soFromBeginning);
   AddLength (FTxStream, s.Size);
