@@ -657,7 +657,7 @@ begin
     begin
       x := x or $04;
       if WillRetain then
-        x := x or $10;
+        x := x or $20;
       x := x or (ord (WillQos) shl 3);
     end;
   if Clean then
