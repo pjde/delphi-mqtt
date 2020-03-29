@@ -416,13 +416,21 @@ end;
 
 procedure TMQTTParser.Parse (aStr: AnsiString);
 var
+  len: integer;
   aStream : TMemoryStream;
 begin
-  aStream := TMemoryStream.Create;
-  aStream.Write (aStr[1], length (aStr));
-  aStream.Seek (0, soFromBeginning);
-  Parse (aStream);
-  aStream.Free;
+  len := length(aStr);
+  if (len>0) then
+  begin
+    aStream := TMemoryStream.Create;
+    try
+      aStream.Write (aStr[1], len);
+      aStream.Seek (0, soFromBeginning);
+      Parse (aStream);
+    finally  
+      aStream.Free;
+    end;  
+  end;
 end;
 
 procedure TMQTTParser.Reset;
